@@ -1,0 +1,32 @@
+﻿<Properties StartupConfiguration="{8611B428-7D7B-4998-89A8-E79A4D3DE1D0}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="apriorit/BinaryTree.cs">
+    <Files>
+      <File FileName="apriorit/BinaryTree.cs" Line="21" Column="1" />
+      <File FileName="apriorit/Program.cs" />
+      <File FileName="apriorit/BinaryTreeNode.cs" Line="2" Column="1" NotebookId="1" />
+      <File FileName="apriorit/EnumerableExtensions.cs" NotebookId="1" />
+      <File FileName="apriorit/ITraversalStrategy.cs" NotebookId="1" />
+      <File FileName="apriorit/InOrderTraversal.cs" NotebookId="1" />
+      <File FileName="apriorit/PostOrderTraversal.cs" NotebookId="1" />
+      <File FileName="apriorit/PreOrderTraversal.cs" NotebookId="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="apriorit" expanded="True">
+            <Node name="apriorit" expanded="True">
+              <Node name="BinaryTree.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.ItemProperties.apriorit PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|anycpu" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

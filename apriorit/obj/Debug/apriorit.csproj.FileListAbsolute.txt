@@ -1,0 +1,5 @@
+/Users/dmitryhoma/Projects/apriorit/apriorit/bin/Debug/apriorit.exe
+/Users/dmitryhoma/Projects/apriorit/apriorit/bin/Debug/apriorit.pdb
+/Users/dmitryhoma/Projects/apriorit/apriorit/obj/Debug/apriorit.csprojAssemblyReference.cache
+/Users/dmitryhoma/Projects/apriorit/apriorit/obj/Debug/apriorit.exe
+/Users/dmitryhoma/Projects/apriorit/apriorit/obj/Debug/apriorit.pdb
