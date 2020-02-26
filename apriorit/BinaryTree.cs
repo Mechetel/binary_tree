@@ -1,282 +1,147 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace apriorit
 {
-    public class BinaryTree<T> : ICollection<T> where T : IComparable<T>
+    class BinaryTree
     {
-        private ITraversalStrategy<T> _traversalStrategy;
-        private BinaryTreeNode<T> _head;
+        public Node Root { get; set; }
 
-        public BinaryTree(ITraversalStrategy<T> traversalStrategy)
+        public bool Add(int value)
         {
-            _traversalStrategy = traversalStrategy ?? throw new ArgumentNullException(nameof(traversalStrategy));
-        }
+            Node before = null, after = this.Root;
 
-        public BinaryTree(IEnumerable<T> collection)
-        {
-            AddRange(collection);
-        }
-
-        public BinaryTree(int capacity)
-        {
-            if (capacity <= 0)
+            while (after != null)
             {
-                throw new ArgumentOutOfRangeException("Capacity should be more then zero.");
+                before = after;
+                if (value < after.Data) //Is new node in left tree? 
+                    after = after.LeftNode;
+                else if (value > after.Data) //Is new node in right tree?
+                    after = after.RightNode;
+                else
+                {
+                    //Exist same value
+                    return false;
+                }
             }
 
-            IsFixedSize = true;
-            Capacity = capacity;
-        }
+            Node newNode = new Node();
+            newNode.Data = value;
 
-        public BinaryTree()
-        {
-        }
-
-        public BinaryTreeNode<T> Head => _head;
-
-        public ITraversalStrategy<T> TraversalStrategy
-        {
-            get => _traversalStrategy ?? (_traversalStrategy = new InOrderTraversal<T>());
-            set => _traversalStrategy = value ?? throw new ArgumentNullException(nameof(value));
-        }
-
-        public int Count { get; private set; }
-
-        public int Capacity { get; }
-
-        public bool IsReadOnly => false;
-
-        public bool IsFixedSize { get; }
-
-        public void Add(T value)
-        {
-            if (IsFixedSize && Count >= Capacity)
-            {
-                throw new NotSupportedException($"The BinaryTree has a fixed size. Can not add more than {Capacity} items");
-            }
-
-            if (_head == null)
-            {
-                _head = new BinaryTreeNode<T>(value);
-            }
+            if (this.Root == null)//Tree ise empty
+                this.Root = newNode;
             else
             {
-                AddTo(_head, value);
-            }
-            Count++;
-        }
-
-        public void AddRange(IEnumerable<T> collection)
-        {
-            if (collection == null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
-
-            using (IEnumerator<T> enumerator = collection.GetEnumerator())
-            {
-                while (enumerator.MoveNext())
-                {
-                    Add(enumerator.Current);
-                }
-            }
-        }
-
-        public bool Contains(T value)
-        {
-            return FindWithParent(value, out var _) != null;
-        }
-
-        public bool Remove(T value)
-        {
-            var current = FindWithParent(value, out var parent);
-
-            if (current == null)
-            {
-                return false;
-            }
-
-            Count--;
-
-            if (current.Right == null)
-            {
-                if (parent == null)
-                {
-                    _head = current.Left;
-                }
+                if (value < before.Data)
+                    before.LeftNode = newNode;
                 else
-                {
-                    var result = parent.CompareTo(current.Value);
-                    if (result > 0)
-                    {
-                        parent.Left = current.Left;
-                    }
-                    else if (result < 0)
-                    {
-                        parent.Right = current.Left;
-                    }
-                }
+                    before.RightNode = newNode;
             }
-            else if (current.Right.Left == null)
-            {
-                current.Right.Left = current.Left;
 
-                if (parent == null)
-                {
-                    _head = current.Right;
-                }
-                else
-                {
-                    var result = parent.CompareTo(current.Value);
-                    if (result > 0)
-                    {
-                        parent.Left = current.Right;
-                    }
-                    else if (result < 0)
-                    {
-                        parent.Right = current.Right;
-                    }
-                }
-            }
-            else
-            {
-                var leftMost = current.Right.Left;
-                var leftMostParent = current.Right;
-
-                while (leftMost.Left != null)
-                {
-                    leftMostParent = leftMost;
-                    leftMost = leftMost.Left;
-                }
-
-                leftMostParent.Left = leftMost.Right;
-                leftMost.Left = current.Left;
-                leftMost.Right = current.Right;
-
-                if (parent == null)
-                {
-                    _head = leftMost;
-                }
-                else
-                {
-                    var result = parent.CompareTo(current.Value);
-
-                    if (result > 0)
-                    {
-                        parent.Left = leftMost;
-                    }
-                    else if (result < 0)
-                    {
-                        parent.Right = leftMost;
-                    }
-                }
-            }
             return true;
         }
 
-        public void Clear()
+        public Node Find(int value)
         {
-            _head = null;
-            Count = 0;
+            return this.Find(value, this.Root);
         }
 
-        public void CopyTo(T[] array, int arrayIndex)
+        public void Remove(int value)
         {
-            if (array == null)
-            {
-                throw new ArgumentNullException(nameof(array));
-            }
-
-            if (array.GetLowerBound(0) != 0)
-            {
-                throw new ArgumentException("Non zero lower bound");
-            }
-
-            if (arrayIndex < 0)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-
-            if (array.Length - arrayIndex < Count)
-            {
-                throw new ArgumentException();
-            }
-
-            var items = TraversalStrategy.Traversal(_head);
-            while (items.MoveNext())
-            {
-                array[arrayIndex++] = items.Current;
-            }
+            Remove(this.Root, value);
         }
 
-        [Obsolete]
-        public void SetTraversalStrategy(ITraversalStrategy<T> traversalStrategy)
+        private Node Remove(Node parent, int key)
         {
-            _traversalStrategy = traversalStrategy ?? throw new ArgumentNullException(nameof(traversalStrategy));
-        }
+            if (parent == null) return parent;
 
-        private static void AddTo(BinaryTreeNode<T> node, T value)
-        {
-            if (value.CompareTo(node.Value) < 0)
-            {
-                if (node.Left == null)
-                {
-                    node.Left = new BinaryTreeNode<T>(value);
-                }
-                else
-                {
-                    AddTo(node.Left, value);
-                }
-            }
+            if (key < parent.Data) parent.LeftNode = Remove(parent.LeftNode, key);
+            else if (key > parent.Data)
+                parent.RightNode = Remove(parent.RightNode, key);
+
+            // if value is same as parent's value, then this is the node to be deleted  
             else
             {
-                if (node.Right == null)
-                {
-                    node.Right = new BinaryTreeNode<T>(value);
-                }
-                else
-                {
-                    AddTo(node.Right, value);
-                }
+                // node with only one child or no child  
+                if (parent.LeftNode == null)
+                    return parent.RightNode;
+                else if (parent.RightNode == null)
+                    return parent.LeftNode;
+
+                // node with two children: Get the inorder successor (smallest in the right subtree)  
+                parent.Data = MinValue(parent.RightNode);
+
+                // Delete the inorder successor  
+                parent.RightNode = Remove(parent.RightNode, parent.Data);
             }
+
+            return parent;
         }
 
-        private BinaryTreeNode<T> FindWithParent(T value, out BinaryTreeNode<T> parent)
+        private int MinValue(Node node)
         {
-            var current = _head;
-            parent = null;
+            int minv = node.Data;
 
-            while (current != null)
+            while (node.LeftNode != null)
             {
-                var result = current.CompareTo(value);
-                if (result > 0)
-                {
-                    parent = current;
-                    current = current.Left;
-                }
-                else if (result < 0)
-                {
-                    parent = current;
-                    current = current.Right;
-                }
-                else
-                {
-                    break;
-                }
+                minv = node.LeftNode.Data;
+                node = node.LeftNode;
             }
-            return current;
+
+            return minv;
         }
 
-        public IEnumerator<T> GetEnumerator()
+        private Node Find(int value, Node parent)
         {
-            return TraversalStrategy.Traversal(_head);
+            if (parent != null)
+            {
+                if (value == parent.Data) return parent;
+                if (value < parent.Data)
+                    return Find(value, parent.LeftNode);
+                else
+                    return Find(value, parent.RightNode);
+            }
+
+            return null;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        public int GetTreeDepth()
         {
-            return GetEnumerator();
+            return this.GetTreeDepth(this.Root);
+        }
+
+        private int GetTreeDepth(Node parent)
+        {
+            return parent == null ? 0 : Math.Max(GetTreeDepth(parent.LeftNode), GetTreeDepth(parent.RightNode)) + 1;
+        }
+
+        public void TraversePreOrder(Node parent)
+        {
+            if (parent != null)
+            {
+                Console.Write(parent.Data + " ");
+                TraversePreOrder(parent.LeftNode);
+                TraversePreOrder(parent.RightNode);
+            }
+        }
+
+        public void TraverseInOrder(Node parent)
+        {
+            if (parent != null)
+            {
+                TraverseInOrder(parent.LeftNode);
+                Console.Write(parent.Data + " ");
+                TraverseInOrder(parent.RightNode);
+            }
+        }
+
+        public void TraversePostOrder(Node parent)
+        {
+            if (parent != null)
+            {
+                TraversePostOrder(parent.LeftNode);
+                TraversePostOrder(parent.RightNode);
+                Console.Write(parent.Data + " ");
+            }
         }
     }
 }

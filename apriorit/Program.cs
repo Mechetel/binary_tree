@@ -6,54 +6,38 @@ namespace apriorit
     {
         public static void Main(string[] args)
         {
-            var binaryTree = new BinaryTree<int> { 8, 5, 12, 3, 7, 10, 15 };
+            BinaryTree binaryTree = new BinaryTree();
 
-            binaryTree.PrintAsTree();
+            binaryTree.Add(1);
+            binaryTree.Add(2);
+            binaryTree.Add(7);
+            binaryTree.Add(3);
+            binaryTree.Add(10);
+            binaryTree.Add(5);
+            binaryTree.Add(8);
 
-            Console.Write("Pre-order : ");
-            binaryTree.TraversalStrategy = new PreOrderTraversal<int>();
-            binaryTree.PrintToConsole();
+            Node node = binaryTree.Find(5);
+            int depth = binaryTree.GetTreeDepth();
 
-            Console.WriteLine(Environment.NewLine);
-            Console.Write("Post-order : ");
-            binaryTree.TraversalStrategy = new PostOrderTraversal<int>();
-            binaryTree.PrintToConsole();
+            Console.WriteLine("PreOrder Traversal:");
+            binaryTree.TraversePreOrder(binaryTree.Root);
+            Console.WriteLine();
 
-            Console.WriteLine(Environment.NewLine);
-            Console.Write("In-order : ");
-            binaryTree.TraversalStrategy = new InOrderTraversal<int>();
-            binaryTree.PrintToConsole();
+            Console.WriteLine("InOrder Traversal:");
+            binaryTree.TraverseInOrder(binaryTree.Root);
+            Console.WriteLine();
 
-            Console.WriteLine(Environment.NewLine);
-            Console.WriteLine($"Count : {binaryTree.Count}");
+            Console.WriteLine("PostOrder Traversal:");
+            binaryTree.TraversePostOrder(binaryTree.Root);
+            Console.WriteLine();
 
-            const int remove = 10;
-            var isRemoved = binaryTree.Remove(remove);
-            if (isRemoved)
-            {
-                Console.WriteLine(Environment.NewLine);
-                Console.WriteLine($"Node {remove} was removed, count after remove : {binaryTree.Count}");
+            binaryTree.Remove(7);
+            binaryTree.Remove(8);
 
-                Console.Write("Values: ");
-                binaryTree.PrintToConsole();
-            }
+            Console.WriteLine("PreOrder Traversal After Removing Operation:");
+            binaryTree.TraversePreOrder(binaryTree.Root);
+            Console.WriteLine();
 
-            var arr = new int[binaryTree.Count];
-            binaryTree.CopyTo(arr, 0);
-
-            Console.WriteLine(Environment.NewLine);
-            Console.WriteLine("Copy to array: ");
-            arr.PrintToConsole();
-
-            binaryTree.Clear();
-
-            Console.WriteLine(Environment.NewLine);
-            Console.WriteLine($"Count after clear: {binaryTree.Count}");
-            Console.Write("Values after clear: ");
-            binaryTree.PrintToConsole();
-
-            Console.WriteLine(Environment.NewLine);
-            Console.WriteLine("Press any key to exit...");
             Console.ReadLine();
         }
     }
